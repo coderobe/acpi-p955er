@@ -1,0 +1,19 @@
+--- ../acpi/disasm/dsdt.dsl     2019-01-31 17:17:41.636040134 +0100
++++ ../acpi/patch/dsdt.dsl      2019-02-15 21:51:12.624668673 +0100
+@@ -51109,6 +51109,15 @@
+             OperationRegion (EC81, EmbeddedControl, Zero, 0xFF)
+             Field (EC81, ByteAcc, Lock, Preserve)
+             {
++                // coderobe: fan control registers
++                Offset (0xD0),
++                FC00,   8,
++                FC01,   8,    // CPU Fan Speed
++                FG00,   8,
++                FG01,   8,    // GPU Fan0 Speed
++                FG10,   8,
++                FG11,   8,    // GPU Fan1 Speed
++                // coderobe: end
+                 Offset (0xF8), 
+                 FCMD,   8, 
+                 FDAT,   8, 
+
