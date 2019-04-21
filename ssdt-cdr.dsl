@@ -118,11 +118,31 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
                 \CDR.LED.LED3 = Arg0
                 \CDR.LED.CALL (\CDR.LED.L3OF | \CDR.LED.LED3)
             }
+            // Store brightness level (max 255)
+            Name (LVLS, 64)
             // Set brightness level
             Method (LVL, 1, Serialized)
             {
-                Local0 = 0xF4000000 | Arg0
-                \CDR.LED.CALL (Local0)
+                \CDR.LED.LVLS = Arg0
+                \CDR.LED.CALL (0xF4000000 | \CDR.LED.LVLS)
+            }
+            // Increase brightness
+            Method (LVLU, 0, Serialized)
+            {
+                If (\CDR.LED.LVLS < 248)
+                {
+                    \CDR.LED.LVLS = \CDR.LED.LVLS + 8
+                    \CDR.LED.LVL (\CDR.LED.LVLS)
+                }
+            }
+            // Decrease brightness
+            Method (LVLD, 0, Serialized)
+            {
+                If (\CDR.LED.LVLS > 7)
+                {
+                    \CDR.LED.LVLS = \CDR.LED.LVLS - 8
+                    \CDR.LED.LVL (\CDR.LED.LVLS)
+                }
             }
         }
     }
