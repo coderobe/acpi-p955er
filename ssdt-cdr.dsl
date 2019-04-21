@@ -68,18 +68,55 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
             {
                 \CDR.LED.CALL (0xE0003001)
             }
+            // LED color state
+            Name (LED1, 0)
+            Name (LED2, 0)
+            Name (LED3, 0)
+            // LED WMI offsets
+            Name (L1OF, 0xF0000000)
+            Name (L2OF, 0xF1000000)
+            Name (L3OF, 0xF2000000)
+            // Update LED color
+            Method (COLU, 0, Serialized)
+            {
+                \CDR.LED.RST ()
+                \CDR.LED.CALL (\CDR.LED.L1OF | \CDR.LED.LED1)
+                \CDR.LED.CALL (\CDR.LED.L2OF | \CDR.LED.LED2)
+                \CDR.LED.CALL (\CDR.LED.L3OF | \CDR.LED.LED3)
+            }
             // Set multicolor RGB
             Method (COLM, 3, Serialized)
             {
-                \CDR.LED.RST ()
-                \CDR.LED.CALL (0xF0000000 | Arg0)
-                \CDR.LED.CALL (0xF1000000 | Arg1)
-                \CDR.LED.CALL (0xF2000000 | Arg2)
+                \CDR.LED.LED1 = Arg0
+                \CDR.LED.LED2 = Arg1
+                \CDR.LED.LED3 = Arg2
+                \CDR.LED.COLU ()
             }
             // Set single color RGB
             Method (COL, 1, Serialized)
             {
-                \CDR.LED.COLM(Arg0, Arg0, Arg0)
+                \CDR.LED.LED1 = Arg0
+                \CDR.LED.LED2 = Arg0
+                \CDR.LED.LED3 = Arg0
+                \CDR.LED.COLU ()
+            }
+            // Set LED 1 color RGB
+            Method (COL1, 1, Serialized)
+            {
+                \CDR.LED.LED1 = Arg0
+                \CDR.LED.CALL (\CDR.LED.L1OF | \CDR.LED.LED1)
+            }
+            // Set LED 2 color RGB
+            Method (COL2, 1, Serialized)
+            {
+                \CDR.LED.LED2 = Arg0
+                \CDR.LED.CALL (\CDR.LED.L2OF | \CDR.LED.LED2)
+            }
+            // Set LED 3 color RGB
+            Method (COL3, 1, Serialized)
+            {
+                \CDR.LED.LED3 = Arg0
+                \CDR.LED.CALL (\CDR.LED.L3OF | \CDR.LED.LED3)
             }
             // Set brightness level
             Method (LVL, 1, Serialized)
