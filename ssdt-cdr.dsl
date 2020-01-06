@@ -30,18 +30,18 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
             // WMI dispatch method
             Method (CALL, 1, Serialized)
             {
-                \CDR.WMI (0, 0x79, Arg0)
+                ^^WMI (0, 0x79, Arg0)
             }
             // Reset controller
             Method (RST, 0, Serialized)
             {
-                \CDR.FAN.CALL (0x1000000)
+                CALL (0x1000000)
             }
             // Enable auto-mode
             Method (AUTO, 0, Serialized)
             {
-                \CDR.FAN.RST ()
-                \CDR.FAN.CALL (0x7000000)
+                RST ()
+                CALL (0x7000000)
             }
         }
         Device (LED)
@@ -51,22 +51,22 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
             // WMI dispatch method
             Method (CALL, 1, Serialized)
             {
-                \CDR.WMI (0, 0x67, Arg0)
+                ^^WMI (0, 0x67, Arg0)
             }
             // Reset controller
             Method (RST, 0, Serialized)
             {
-                \CDR.LED.CALL (0x10000000)
+                CALL (0x10000000)
             }
             // Enable LEDs
             Method (ON, 0, Serialized)
             {
-                \CDR.LED.CALL (0xE007F001)
+                CALL (0xE007F001)
             }
             // Disable LEDs
             Method (OFF, 0, Serialized)
             {
-                \CDR.LED.CALL (0xE0003001)
+                CALL (0xE0003001)
             }
             // LED color state
             Name (LED1, 0)
@@ -79,70 +79,74 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
             // Update LED color
             Method (COLU, 0, Serialized)
             {
-                \CDR.LED.RST ()
-                \CDR.LED.CALL (\CDR.LED.L1OF | \CDR.LED.LED1)
-                \CDR.LED.CALL (\CDR.LED.L2OF | \CDR.LED.LED2)
-                \CDR.LED.CALL (\CDR.LED.L3OF | \CDR.LED.LED3)
+                RST ()
+                CALL (\CDR.LED.L1OF | \CDR.LED.LED1)
+                CALL (\CDR.LED.L2OF | \CDR.LED.LED2)
+                CALL (\CDR.LED.L3OF | \CDR.LED.LED3)
             }
             // Set multicolor RGB
             Method (COLM, 3, Serialized)
             {
-                \CDR.LED.LED1 = Arg0
-                \CDR.LED.LED2 = Arg1
-                \CDR.LED.LED3 = Arg2
-                \CDR.LED.COLU ()
+                LED1 = Arg0
+                LED2 = Arg1
+                LED3 = Arg2
+                COLU ()
             }
             // Set single color RGB
             Method (COL, 1, Serialized)
             {
-                \CDR.LED.LED1 = Arg0
-                \CDR.LED.LED2 = Arg0
-                \CDR.LED.LED3 = Arg0
-                \CDR.LED.COLU ()
+                LED1 = Arg0
+                LED2 = Arg0
+                LED3 = Arg0
+                COLU ()
             }
             // Set LED 1 color RGB
             Method (COL1, 1, Serialized)
             {
-                \CDR.LED.LED1 = Arg0
-                \CDR.LED.CALL (\CDR.LED.L1OF | \CDR.LED.LED1)
+                LED1 = Arg0
+                CALL (L1OF | LED1)
             }
             // Set LED 2 color RGB
             Method (COL2, 1, Serialized)
             {
-                \CDR.LED.LED2 = Arg0
-                \CDR.LED.CALL (\CDR.LED.L2OF | \CDR.LED.LED2)
+                LED2 = Arg0
+                CALL (L2OF | LED2)
             }
             // Set LED 3 color RGB
             Method (COL3, 1, Serialized)
             {
-                \CDR.LED.LED3 = Arg0
-                \CDR.LED.CALL (\CDR.LED.L3OF | \CDR.LED.LED3)
+                LED3 = Arg0
+                CALL (L3OF | LED3)
             }
             // Store brightness level (max 255)
             Name (LVLS, 64)
             // Set brightness level
             Method (LVL, 1, Serialized)
             {
-                \CDR.LED.LVLS = Arg0
-                \CDR.LED.CALL (0xF4000000 | \CDR.LED.LVLS)
+                LVLS = Arg0
+                CALL (0xF4000000 | LVLS)
             }
             // Increase brightness
             Method (LVLU, 0, Serialized)
             {
-                If (\CDR.LED.LVLS < 248)
+                If (LVLS < 248)
                 {
-                    \CDR.LED.LVLS = \CDR.LED.LVLS + 8
-                    \CDR.LED.LVL (\CDR.LED.LVLS)
+                    LVLS = LVLS + 8
+                    LVL (LVLS)
+                    Return (0)
                 }
+                Return (1)
             }
             // Decrease brightness
             Method (LVLD, 0, Serialized)
             {
-                If (\CDR.LED.LVLS > 7)
+                If (LVLS > 7)
                 {
-                    \CDR.LED.LVLS = \CDR.LED.LVLS - 8
-                    \CDR.LED.LVL (\CDR.LED.LVLS)
+                    LVLS = LVLS - 8
+                    LVL (LVLS)
+                    Return (0)
                 }
+                Return (1)
             }
         }
     }
