@@ -72,10 +72,75 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
             Name (LED1, 0)
             Name (LED2, 0)
             Name (LED3, 0)
+            // LED current mode
+            // 0 - custom color
+            // 1 - random
+            // 2 - breathe
+            // 3 - cycle
+            // 4 - wave
+            // 5 - dance
+            // 6 - tempo
+            // 7 - flash
+            Name (CMOD, 0)
             // LED WMI offsets
             Name (L1OF, 0xF0000000)
             Name (L2OF, 0xF1000000)
             Name (L3OF, 0xF2000000)
+            // Set LED mode
+            Method (MODE, 1, Serialized)
+            {
+                If (Arg0 > 7)
+                {
+                    Store ("In CDR.LED.MODE: Arg0 out of range, given:", Debug)
+                    Store (Arg0, Debug)
+                    Return (1)
+                }
+                CMOD = Arg0
+                Switch (Arg0)
+                {
+                    Case (0) // Custom color mode
+                    {
+                        COLU ()
+                        Return (0)
+                    }
+                    Case (1) // Random color
+                    {
+                        Local0 = 0x70000000
+                    }
+                    Case (2) // "Dance"
+                    {
+                        Local0 = 0x80000000
+                    }
+                    Case (3) // "Tempo"
+                    {
+                        Local0 = 0x90000000
+                    }
+                    Case (4) // "Flash"
+                    {
+                        Local0 = 0xA0000000
+                    }
+                    Case (5) // "Wave"
+                    {
+                        Local0 = 0xB0000000
+                    }
+                    Case (6) // "Breathe"
+                    {
+                        Local0 = 0x1002a000
+                    }
+                    Case (7) // "Cycle"
+                    {
+                        Local0 = 0x33010000
+                    }
+                }
+                RST ()
+                CALL (Local0)
+                Return (0)
+            }
+            // Get current mode
+            Method (GMOD, 0, Serialized)
+            {
+                Return (CMOD)
+            }
             // Update LED color
             Method (COLU, 0, Serialized)
             {
