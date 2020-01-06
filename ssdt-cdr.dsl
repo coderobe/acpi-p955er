@@ -226,6 +226,7 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
     {
         // Declare as generic device
         Name (_HID, EisaId ("PNP0C02"))
+        Name (_CID, "MON00000")
         // Define fan aliases
         Name (
             TACH,
@@ -235,55 +236,59 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
                 "GPU Fan #2", "FAN2"
             }
         )
-        // Fan control helper method
+        // Combine bytes to short
         Method (B1B2, 2, NotSerialized)
         {
             Return(Or(Arg0, ShiftLeft(Arg1, 8)))
         }
         // Fan speed read methods
+        Method (FAN, 1, Serialized)
+        {
+            If (Arg0 > 2)
+            {
+                Store ("In SMCD.FAN: Arg0 out of range, given:", Debug)
+                Store (Arg0, Debug)
+                Return (0)
+            }
+            Store ("In SMCD.FAN", Debug)
+
+            If (\_SB.PCI0.LPCB.EC.ECOK)
+            {
+                Switch (Arg0)
+                {
+                     Case (0)
+                     {
+                         Local0 = B1B2(\_SB.PCI0.LPCB.EC.FC01, \_SB.PCI0.LPCB.EC.FC00)
+                     }
+                     Case (1)
+                     {
+                         Local0 = B1B2(\_SB.PCI0.LPCB.EC.FG01, \_SB.PCI0.LPCB.EC.FG00)
+                     }
+                     Case (2)
+                     {
+                         Local0 = B1B2(\_SB.PCI0.LPCB.EC.FG11, \_SB.PCI0.LPCB.EC.FG10)
+                     }
+                }
+                If (Local0 <= 0)
+                {
+                    Return (0)
+                }
+                Local0 = 2156220 / Local0
+                Return (Local0)
+            }
+            Return (0)
+        }
         Method (FAN0, 0, Serialized)
         {
-            If (\_SB.PCI0.LPCB.EC.ECOK)
-            {
-                Local0 = B1B2(\_SB.PCI0.LPCB.EC.FC01, \_SB.PCI0.LPCB.EC.FC00)
-                If (Local0 <= 0)
-                {
-                    Return (0)
-                }
-                Local0 = 2156220 / Local0
-                Return (Local0)
-            }
-            Return (0)
+            Return (FAN (0))
         }
-
         Method (FAN1, 0, Serialized)
         {
-            If (\_SB.PCI0.LPCB.EC.ECOK)
-            {
-                Local0 = B1B2(\_SB.PCI0.LPCB.EC.FG01, \_SB.PCI0.LPCB.EC.FG00)
-                If (Local0 <= 0)
-                {
-                    Return (0)
-                }
-                Local0 = 2156220 / Local0
-                Return (Local0)
-            }
-            Return (0)
+            Return (FAN (1))
         }
-
         Method (FAN2, 0, Serialized)
         {
-            If (\_SB.PCI0.LPCB.EC.ECOK)
-            {
-                Local0 = B1B2(\_SB.PCI0.LPCB.EC.FG11, \_SB.PCI0.LPCB.EC.FG10)
-                If (Local0 <= 0)
-                {
-                    Return (0)
-                }
-                Local0 = 2156220 / Local0
-                Return (Local0)
-            }
-            Return (0)
+            Return (FAN (2))
         }
     }
 }
