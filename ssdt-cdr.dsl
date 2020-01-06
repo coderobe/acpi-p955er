@@ -17,6 +17,12 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
         // Declare as generic device
         Name (_HID, EisaId ("PNP0C02"))
         Name (_CID, "CODEROBE")
+        // Initialize
+        Method (_INI, 0, NotSerialized)
+        {
+            ^FAN._INI ()
+            ^LED._INI ()
+        }
         // Proxy for WMBB
         // as direct calls cause a panic (o.O)
         Method (WMI, 3, Serialized)
@@ -27,6 +33,12 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
         {
             // Declare as generic device
             Name (_HID, EisaId ("PNP0C02"))
+            // Initialize
+            Method (_INI, 0, NotSerialized)
+            {
+                Store ("In CDR.FAN._INI", Debug)
+                AUTO ()
+            }
             // WMI dispatch method
             Method (CALL, 1, Serialized)
             {
@@ -48,6 +60,13 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
         {
             // Declare as generic device
             Name (_HID, EisaId ("PNP0C02"))
+            // Initialize
+            Method (_INI, 0, NotSerialized)
+            {
+                Store ("In CDR.LED._INI", Debug)
+                ON ()
+                MODE (6)
+            }
             // WMI dispatch method
             Method (CALL, 1, Serialized)
             {
