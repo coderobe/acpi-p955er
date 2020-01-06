@@ -185,6 +185,11 @@ DefinitionBlock ("", "SSDT", 2, "hack", "coderobe", 0)
             }
             // Store brightness level (max 255)
             Name (LVLS, 64)
+            // Return brightness level
+            Method (LVLG, 0, Serialized)
+            {
+                Return (LVLS)
+            }
             // Set brightness level
             Method (LVL, 1, Serialized)
             {
